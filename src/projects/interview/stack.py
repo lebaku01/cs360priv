@@ -10,6 +10,7 @@ import heapq
 from typing import Any
 
 
+
 class StackError(Exception):
     """Stack errors"""
 
@@ -36,9 +37,17 @@ class Stack:
 
         :param item: a new item to push onto the stack
         """
-        # TODO: Implement this method
-        ...
-
+        #
+        # check if the stack is empty before calling the peek method in case #1
+        #
+        if len(self.items) != 0:
+            #
+            # push item and make its priority one
+            # less than the current top of the stack
+            #
+            heapq.heappush(self.items, (self.__peek()[0] - 1, item))
+        else:
+            heapq.heappush(self.items, (0, item))
 
     def pop(self) -> Any:
         """
@@ -47,9 +56,10 @@ class Stack:
         :return: the top element of the stack
         :raise StackError if the stack is empty
         """
-        # TODO: Implement this method
-        ...
-
+        if len(self.items) == 0:
+            raise StackError()
+        else:
+            return heapq.heappop(self.items)[1]
 
     def peek(self) -> Any:
         """
@@ -58,9 +68,21 @@ class Stack:
         :return: the top element of the stack
         :raise StackError if the stack is empty
         """
-        # TODO: Implement this method
-        ...
+        popped = heapq.heappop(self.items)
+        heapq.heappush(self.items, popped)
+        return popped[1]
 
+    def __peek(self):
+        """
+        A private version of the peek method that returns the top element of the heap as a tuple, rather than as
+        a single element
+        :return: the top tuple of the heap
+        :raise StackError if the stack is empty
+
+        """
+        popped = heapq.heappop(self.items)
+        heapq.heappush(self.items, popped)
+        return popped
 
     def __bool__(self) -> bool:
         """
@@ -68,9 +90,7 @@ class Stack:
 
         :return: False if the stack is empty, True otherwise
         """
-        # TODO: Implement this method
-        ...
-
+        return len(self.items) > 0
 
     def __len__(self) -> int:
         """
@@ -78,6 +98,38 @@ class Stack:
 
         :return: number of items in the stack (0 if the stack is empty)
         """
-        # TODO: Implement this method
-        ...
+        #
+        #    recursively take apart the stack, and then when the stack is empty put the
+        #    stack back together while counting the number of calls to count() on the way
+        #    out
+        #
+        def count(length: int) -> int:
+            if not self.__bool__():
+                return 0
+            else:
+                popped = heapq.heappop(self.items)
+                depth = count(length + 1)
+                heapq.heappush(self.items, popped)
+                return depth + 1
 
+        return count(0)
+
+# really basic main
+
+
+stack = Stack()
+print(stack.__bool__())
+print(stack == True)
+stack.push('a')
+print(stack.peek())
+stack.push('b')
+print(stack.peek())
+stack.push('c')
+print(stack.peek())
+print(stack.__len__())
+print(stack.peek())
+stack.pop()
+print(stack.peek())
+stack.pop()
+print(stack.peek())
+stack.pop()

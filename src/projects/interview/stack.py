@@ -117,19 +117,4 @@ class Stack:
 # really basic main
 
 
-stack = Stack()
-print(stack.__bool__())
-print(stack == True)
-stack.push('a')
-print(stack.peek())
-stack.push('b')
-print(stack.peek())
-stack.push('c')
-print(stack.peek())
-print(stack.__len__())
-print(stack.peek())
-stack.pop()
-print(stack.peek())
-stack.pop()
-print(stack.peek())
-stack.pop()
+

@@ -389,7 +389,7 @@ class DrawingApplication(tkinter.Frame):
         sideLabel = tkinter.Label(sideBar, text="Side length")
         sideLabel.pack()
         sideSize = tkinter.StringVar()
-        sideEntry = tkinter.Entry(sideBar, textvariable=radiusSize)
+        sideEntry = tkinter.Entry(sideBar, textvariable=sideSize)
         sideSize.set(str(10))
         sideEntry.pack()
 

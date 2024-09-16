@@ -49,6 +49,24 @@ class CircleCommand:
         return f'<Command radius="{self.radius}" width="{str(self.width)}" color="{self.color}">Circle</Command>'
 
 
+class TriangleCommand:
+    def __init__(self, side, width, color="black"):
+        self.side = side
+        self.width = width
+        self.color = color
+
+    def draw(self, turtle):
+        print(self.side)
+        turtle.width(self.width)
+        turtle.pencolor(self.color)
+        for i in range(3):
+            turtle.forward(self.side)
+            turtle.left(120)
+
+    def __str__(self):
+        return f'<Command radius="{self.side}" width="{str(self.width)}" color="{self.color}">Circle</Command>'
+
+
 class BeginFillCommand:
     def __init__(self, color):
         self.color = color
@@ -367,6 +385,36 @@ class DrawingApplication(tkinter.Frame):
         penEntry.pack()
         # This is the color black.
         penColor.set("#000000")
+###
+        sideLabel = tkinter.Label(sideBar, text="Side length")
+        sideLabel.pack()
+        sideSize = tkinter.StringVar()
+        sideEntry = tkinter.Entry(sideBar, textvariable=radiusSize)
+        sideSize.set(str(10))
+        sideEntry.pack()
+
+        def triangleHandler():
+            # When drawing, a command is created and then the command is drawn by calling
+            # the draw method. Adding the command to the graphicsCommands sequence means the
+            # application will remember the picture.
+            cmd = TriangleCommand(
+                float(sideSize.get()), float(widthSize.get()), penColor.get()
+            )
+            cmd.draw(theTurtle)
+            self.graphicsCommands.append(cmd)
+
+            # These two lines are needed to update the screen and to put the focus back
+            # in the drawing canvas. This is necessary because when pressing "u" to undo,
+            # the screen must have focus to receive the key press.
+            screen.update()
+            screen.listen()
+
+        # This creates the button widget in the sideBar. The fill=tkinter.BOTH causes the button
+        # to expand to fill the entire width of the sideBar.
+        triangleButton = tkinter.Button(
+            sideBar, text="Draw Triangle", command=triangleHandler
+        )
+        triangleButton.pack(fill=tkinter.BOTH)
 
         def getPenColor():
             color = tkinter.colorchooser.askcolor()

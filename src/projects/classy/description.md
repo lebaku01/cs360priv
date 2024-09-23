@@ -1,4 +1,5 @@
-# A Classy Problem
+let text = document.createTextNode(`Hello ${name}`);
+    greeting.appendChild(text);# A Classy Problem
 
 <https://open.kattis.com/problems/classy>
 

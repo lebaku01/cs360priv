@@ -34,6 +34,30 @@ def classify(people: dict) -> list[str]:
         def __convert(self):
             ternary = ""
             titles = self.order.split("-")
+            title = titles.pop()
+            if title == "upper":
+                ternary += "2"
+            elif title == "middle":
+                ternary += "2"
+            else:
+                ternary += "1"
+            last = ternary[len(ternary)-1]
+            counter = 1
+            while len(titles) > 0:
+                if title == "upper":
+                    ternary += "2"
+                elif title == "middle":
+                    ternary += "2"
+                else:
+                    ternary += "1"
+                last = ternary[len(ternary)-1]
+                title = titles.pop()
+                counter += 1
+            for trailing in range(self.__MAX_DEPTH - counter):
+                ternary += last
+            return int(ternary, 3)
+
+            '''
             for index in range(self.__MAX_DEPTH):
                 if index < len(titles):
                     if titles[index] == "upper":
@@ -43,8 +67,9 @@ def classify(people: dict) -> list[str]:
                     else:
                         ternary += "0"
                 else:
-                    ternary += "0"
+                    ternary += ternary[index-1]
             return int(ternary, 3)
+            '''
     '''
     construct new Class objects out of the key-value pairs and 
     sort the list using the rank
@@ -53,10 +78,10 @@ def classify(people: dict) -> list[str]:
     output = []
     for pair in pairs:
         output.append(Class(pair[0], pair[1]))
-    output.sort(key=lambda x: x.name, reverse=False)
+    #output.sort(key=lambda y: y.name, reverse=False)
     output.sort(key=lambda x: x.rank, reverse=True)
     for index in range(len(output)):
-        #print(output[index].name + " " + str(output[index].order))
+        #print(output[index].name + " " + str(output[index].rank))
         output[index] = output[index].name
     return output
 
@@ -81,6 +106,7 @@ def read_file(filename: str) -> dict[str, str]:
 def main():
     """Entry point"""
     people = read_file("../../../data/projects/classy/classy03.txt")
+    #people = {'Aardvark': 'upper', 'Beaver': 'upper-upper', 'Cheetah': 'middle-upper', 'Dolphin': 'upper'}
     print(classify(people))
 
 

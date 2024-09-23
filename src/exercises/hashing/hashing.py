@@ -19,8 +19,8 @@ def hash_remainder(key: int, size: int) -> int:
     >>> hash_remainder(40, 9)
     4
     """
-    # TODO: Implement this function
-    ...
+    return key % size
+
 
 
 def hash_mid_sqr(key: int, size: int) -> int:

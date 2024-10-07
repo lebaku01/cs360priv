@@ -74,8 +74,14 @@ class Board:
         :param other: another Board
         :return: `True` if two boards represent the same state, `False` otherwise
         """
-        # TODO: Implement this function
-        ...
+        i = 0
+        j = 2  # because python lacks a do while loop, sorry for the magic number
+        while i < 3 and j == 2:
+            j = 0
+            while j < 3 and self[i][j] == other[i][j]:
+                j += 1
+            i += 1
+        return j == 2
 
     def __hash__(self) -> int:
         """
@@ -112,8 +118,38 @@ class Board:
         If the human has won, return -1.
         Otherwise, return 0.
         """
-        # TODO: Implement this function
-        ...
+        def horizontal_search(board: Board) -> tuple:
+            row = 0
+            col = 1
+            while row < 2 and not(board[row][col - 1] == board[row][col] == board[row][col + 1]) and not isinstance(board[row][col], Dummy):
+                row += 1
+            return row == 2, board[row][col]
+
+        def vertical_search(board: Board) -> tuple:
+            row = 1
+            col = 0
+            while col < 2 and not (board[row - 1][col] == board[row][col] == board[row + 1][col]) and not isinstance(board[row][col], Dummy):
+                col += 1
+            return col == 2, board[row][col]
+
+        def diagonal_search(board: Board) -> tuple:
+            row = 1
+            col = 1
+            return ((board[row][col] == board[row - 1][col - 1] == board[row + 1][col + 1])
+                    or (board[row + 1][col - 1] == board[row][col] == board[row - 1][row + 1])), board[row][col]
+
+        states = (hwin, vwin, dwin) = horizontal_search(self), vertical_search(self), diagonal_search(self)
+        output = 0
+        for state in states:
+            if state[0] == True:
+                print(state)
+                output = state[1]
+        return output
+
+
+
+
+
 
     def full(self) -> bool:
         """
@@ -122,8 +158,16 @@ class Board:
         :return: `True` if the board is completely filled up (no `Dummy` turtles).
         Otherwise, it should return `False`.
         """
-        # TODO: Implement this function
-        ...
+        row = 0
+        col = 2
+        while row < 2 and col == 2:
+            col = 0
+            while col < 2 and isinstance(self.items[row][col], Dummy ):
+                col += 1
+            row += 1
+        return col == 2
+
+
 
     def draw_marks(self) -> None:
         """
@@ -143,8 +187,12 @@ class Board:
 
         :return: a list of tuples where each tuple is a (row, column) pair
         """
-        # TODO: Implement this function
-        ...
+        tuples = []
+        for row in range(3):
+            for col in range(3):
+                if isinstance(self[row][col], Dummy):
+                    tuples.append((row, col))
+        return tuples
 
     def clone(self) -> "Board":
         """
@@ -252,8 +300,32 @@ def minimax(player, board: Board, depth: int = 5) -> int:
     It does this by making a move for the player whose turn it is, and then recursively calling minimax.
     The base case results when, given the state of the board, someone has won or the board is full.
     """
-    # TODO: Implement this function
-    ...
+    # base case: the board is complete:
+    if board.eval() != 0:
+        return board.eval()
+    # recursive case #1: the board is a tie
+    elif board.eval() == 0 and board.available() == []:
+        return 0
+    # recursive case #2 the board is incomplete and non-winning and the player is the computer
+    elif player == 1:
+        moves = []
+        for move in board.available():
+            copy = Board(board)
+            copy[move[0]][move[1]] = player
+            moves.append(minimax(player, copy, depth - 1))
+        return max(moves)
+    # recursive case #3 the board is incomplete and non-winning and the player is the human
+    elif player == -1:
+        moves = []
+        for move in board.available():
+            copy = Board(board)
+            copy[move[0]][move[1]] = player
+            moves.append(minimax(player, copy, depth - 1))
+        return min(moves)
+
+
+
+
 
 
 class TicTacToe(tkinter.Frame):
@@ -352,8 +424,12 @@ class TicTacToe(tkinter.Frame):
             """
             self.locked = True
             next_move = None
-            # TODO: Implement the game logic
-            ...
+            moves = board.available()
+            readout = []
+            for move in moves:
+                readout.append(move, minimax(1, board, AI_LEVEL[self.level]) )
+            next_move = max(readout)
+
             row, col = next_move
             board[row][col] = MarkX(canvas)
             self.locked = False

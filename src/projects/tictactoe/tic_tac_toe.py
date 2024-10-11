@@ -119,30 +119,70 @@ class Board:
         Otherwise, return 0.
         """
         def horizontal_search(board: Board) -> tuple:
-            row = 0
-            col = 1
-            while row < 2 and not(board[row][col - 1] == board[row][col] == board[row][col + 1]) and not isinstance(board[row][col], Dummy):
-                row += 1
-            return row == 2, board[row][col]
+            board_win = False
+            hsearch = False , 0
+            for i in range(3):
+                row_win = True
+                last = board[i][0]
+                for j in range(3):
+                    if board[i][j] != last:
+                        row_win = False
+                    last = board[i][j]
+                if row_win:
+                    board_win = True
+                    hsearch = board_win, last
+            return hsearch
 
         def vertical_search(board: Board) -> tuple:
-            row = 1
+            board_win = False
+            vsearch = False , 0
+            for i in range(3):
+                row_win = True
+                last = board[0][i]
+                for j in range(3):
+                    if board[j][i] != last:
+                        row_win = False
+                    last = board[j][i]
+                if row_win:
+                    board_win = True
+                    vsearch = board_win, last
+            return vsearch
+
+
+        def lrdiagonal_search(board: Board) -> tuple:
+            row = 0
             col = 0
-            while col < 2 and not (board[row - 1][col] == board[row][col] == board[row + 1][col]) and not isinstance(board[row][col], Dummy):
+            last = board[0][0]
+            while row < 3 and board[row][col] == last:
+                last = board[row][col]
+                row += 1
                 col += 1
-            return col == 2, board[row][col]
+            return row == 3, last
 
-        def diagonal_search(board: Board) -> tuple:
-            row = 1
-            col = 1
-            return ((board[row][col] == board[row - 1][col - 1] == board[row + 1][col + 1])
-                    or (board[row + 1][col - 1] == board[row][col] == board[row - 1][row + 1])), board[row][col]
+        def rldiagonal_search(board: Board) -> tuple:
+            last = board[0][0]
+            row = 0
+            col = 0
+            while row < 3 and board[row][col] == last:
+                row += 1
+                col += 1
+                last = board[row][col]
+            return row == 3, last
+        def lrdiagonal_search(board: Board) -> tuple:
+            last = board[2][2]
+            row = 2
+            col = 2
+            while row >= 0 and board[row][col] == last:
+                last = board[row][col]
+                row -= 1
+                col -= 1
+            return row == 3, last
 
-        states = (hwin, vwin, dwin) = horizontal_search(self), vertical_search(self), diagonal_search(self)
+        states = (hwin, vwin, rdwin, ldwin,) = horizontal_search(self), vertical_search(self), lrdiagonal_search(self), rldiagonal_search(self)
+        print(states)
         output = 0
         for state in states:
             if state[0] == True:
-                print(state)
                 output = state[1]
         return output
 

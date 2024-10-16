@@ -14,7 +14,7 @@ import pathlib
 from collections import Counter
 from typing import Any
 
-DATA_DIR = pathlib.Path("data/projects/compdecomp/")
+DATA_DIR = pathlib.Path("../../../data/projects/compdecomp/")
 
 
 class Node:
@@ -52,8 +52,15 @@ def build_tree(all_freq: dict) -> Node:
     """
     heap: list[Node] = []
     # NOTE: Use list comprehension to build a list of Nodes and then heapify it
-    # TODO: Implement this function
-    ...
+    for key, value in all_freq.items():
+        heap.append(Node(key, value, None, None))
+    heapq.heapify(heap)
+
+    while len(heap) >= 2:
+        min_node, second_min_node = heapq.heappop(heap), heapq.heappop(heap)
+        heapq.heappush(heap, Node(None, min_node.weight + second_min_node.weight,
+                                  min_node, second_min_node))
+    return heap[0]
 
 
 def traverse_tree(root: Node) -> str:
@@ -63,8 +70,10 @@ def traverse_tree(root: Node) -> str:
     :param root: tree root
     :return values of a tree
     """
-    # TODO: Implement this function
-    ...
+    if root.value is None:
+        return traverse_tree(root.left) + " " + traverse_tree(root.right)
+    else:
+        return root.value
 
 
 def follow_tree(tree: Node, code: str) -> str | None:
@@ -75,8 +84,20 @@ def follow_tree(tree: Node, code: str) -> str | None:
     :param code: code to find
     :return node value or None
     """
-    # TODO: Implement this function
-    ...
+    index = 0
+    while index < len(code) and tree.value is None:
+        if code[index] == "0":
+            tree = tree.left
+        elif code[index] == "1":
+            tree = tree.right
+        index += 1
+    return tree.value if tree.value else None
+
+
+
+
+
+
 
 
 def mark_tree(d1: dict, d2: dict, root: Node, path: str) -> tuple[dict, dict] | None:
@@ -89,8 +110,15 @@ def mark_tree(d1: dict, d2: dict, root: Node, path: str) -> tuple[dict, dict] | 
     :param path: path to the current node
     :return (d1, d2) tuple
     """
-    # TODO: Implement this function
-    ...
+    def generate_code(d1: dict, d2: dict, root: Node, path: str) -> None:
+        if root.value is None:
+            generate_code(d1, d2, root.left, path + "0")
+            generate_code(d1, d2, root.right, path + "1")
+        else: # root is terminal
+            d1[root.value] = path
+            d2[path] = root.value
+    generate_code(d1, d2, root, path)
+    return d1, d2
 
 
 def print_codes(d: dict, weights: dict) -> None:
@@ -101,7 +129,8 @@ def print_codes(d: dict, weights: dict) -> None:
     :param weights: character-to-frequency mapping
     """
     print(f"{'Letter':10s}{'Weight':^10s}{'Code':^10s}{'Length':^5s}")
-    # TODO: Implement this function
+
+
     ...
 
 
@@ -112,8 +141,30 @@ def load_codes(codes: dict) -> Node:
     :param codes: code-to-character mapping
     :return root of the Huffman tree
     """
-    # TODO: Implement this function
-    ...
+    root = Node(None,0,None, None)
+
+    def build_hufmann_tree(root: Node, code, value) -> Node:
+        if code == "":
+            root.value = value
+        elif code[0] == "0" and root.left is None:
+            root.left = Node(None, 0)
+            build_hufmann_tree(root.left, code[1:], value)
+        elif code[0] == "1" and root.right is None:
+            root.right = Node(None,0)
+            build_hufmann_tree(root.right, code[1:], value)
+        elif code[0] == "0" and root.left is not None:
+            build_hufmann_tree(root.left, code[1:], value)
+        elif code[0] == "1" and root.right is not None:
+            build_hufmann_tree(root.right, code[1:], value)
+        else:
+            pass
+    for pairs in codes.items():
+        build_hufmann_tree(root, pairs[0], pairs[1])
+    return root
+
+
+
+
 
 
 def compress(text: str, codes: dict) -> tuple[bytes, int]:
@@ -124,8 +175,19 @@ def compress(text: str, codes: dict) -> tuple[bytes, int]:
     :param codes: character-to-code mapping
     :return (packed text, padding length) tuple
     """
-    # TODO: Implement this function
-    ...
+    message = ""
+    for letter in text:
+        message += codes[letter]
+    padding = 8 - (len(message) % 8)
+    for space in range(padding):
+        message += "0"
+    print(len(message))
+    assert len(message) % 8 == 0
+    #make byte array
+    byte_array = bytearray()
+    for index in range(0, len(message), 8):
+        byte_array.append(int(message[index : index + 8], 2))
+    return byte_array, padding
 
 
 def decompress(bytestream: bytes, padding: int, tree: Node) -> str:
@@ -137,8 +199,30 @@ def decompress(bytestream: bytes, padding: int, tree: Node) -> str:
     :param tree: root of the Huffman tree
     :return decompressed (decoded) text
     """
-    # TODO: Implement this function
-    ...
+    message = ""
+    bitstream = ""
+    for byte in bytestream:
+        bitstream += f'{byte:0>8b}'
+    bitstream = bitstream[:-padding]
+
+    candidate = ""
+    for bit in bitstream:
+        candidate += bit
+        decoded = follow_tree(tree, candidate)
+        if decoded is not None:
+            message += decoded
+            candidate = ""
+    return message
+
+
+
+
+
+
+
+
+
+
 
 
 def main():

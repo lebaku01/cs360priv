@@ -44,7 +44,7 @@ def pick_questions_to_answer(filename: str) -> tuple[list[int], int]:
     decision_matrix = []
     decision_matrix_row = []
     capacity = exam_information["time_limit"]
-    questions.insert(0, None)
+    questions.insert(0, (0,0))
     for row in range(len(questions)):
         decision_matrix_row = []
         for col in range(int(float(capacity))+1):
@@ -86,16 +86,13 @@ def pick_questions_to_answer(filename: str) -> tuple[list[int], int]:
     col = len(decision_matrix[0]) - 1
     questions_to_answer = []
 
-    while(col >= 0):
-        if decision_matrix[row][col] != decision_matrix[row][col-1]:
-            print(f"row {row} col {col}")
-            print(f"question {questions[row]}")
+    while(col >= 0 and row > 0):
+        if decision_matrix[row][col] != decision_matrix[row-1][col]:
             questions_to_answer.append(row -1)
             col -= questions[row][1]
             row -= 1
-
-            print(f"after loop {row} col {col}")
-        col -= 1
+        else:
+            row -= 1
 
     return sorted(questions_to_answer), decision_matrix[len(decision_matrix)-1][len(decision_matrix[0])-1]
 

@@ -88,9 +88,13 @@ def pick_questions_to_answer(filename: str) -> tuple[list[int], int]:
 
     while(col >= 0):
         if decision_matrix[row][col] != decision_matrix[row][col-1]:
+            print(f"row {row} col {col}")
+            print(f"question {questions[row]}")
             questions_to_answer.append(row -1)
-            row -= 1
             col -= questions[row][1]
+            row -= 1
+
+            print(f"after loop {row} col {col}")
         col -= 1
 
     return sorted(questions_to_answer), decision_matrix[len(decision_matrix)-1][len(decision_matrix[0])-1]

@@ -38,7 +38,36 @@ def pick_questions_to_answer(filename: str) -> tuple[list[int], int]:
     :return: the list of chosen indices and total point value of all selected questions
     """
     questions, exam_information = parse_file(filename)
-    # implement knapsack from here
+    #
+    #   Generate 2d array in python
+    #
+    decision_matrix = []
+    decision_matrix_row = []
+    for row in range(len(questions)):
+        decision_matrix_row = []
+        for col in range(len(questions)):
+            decision_matrix_row.append(None)
+        decision_matrix.append(decision_matrix_row)
+    #
+    assert len(decision_matrix) == len(questions)
+    assert len(decision_matrix[0]) == len(questions)
+    #
+    #   begin knapsack
+    #
+    #  questions : list[tuple (weight: int, value: int)]
+    #  time_limit : int (C)
+    capacity = exam_information["time_limit"]
+    for row in range(len(decision_matrix)):
+        for col in range(len(decision_matrix[0])):
+            if row == 0:
+                decision_matrix[row][col] = 0
+            elif questions[row][1] > col:
+                decision_matrix[row][col] = decision_matrix[row-1][col]
+            else:
+                assert questions[row][1] < col
+                decision_matrix[row][col] = max(decision_matrix[row-1][col], decision_matrix[row-1][col-questions[row][0]])
+
+
 
 
 def parse_file(filename: str) -> tuple[list[tuple[int, int]], dict]:

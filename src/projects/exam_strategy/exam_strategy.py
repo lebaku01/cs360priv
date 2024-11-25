@@ -43,30 +43,54 @@ def pick_questions_to_answer(filename: str) -> tuple[list[int], int]:
     #
     decision_matrix = []
     decision_matrix_row = []
+    capacity = exam_information["time_limit"]
     for row in range(len(questions)):
         decision_matrix_row = []
-        for col in range(len(questions)):
-            decision_matrix_row.append(None)
+        for col in range(int(float(capacity))):
+            decision_matrix_row.append(0)
         decision_matrix.append(decision_matrix_row)
     #
+    #   print out the list (debug)
+    #
+
     assert len(decision_matrix) == len(questions)
-    assert len(decision_matrix[0]) == len(questions)
+    assert len(decision_matrix[0]) == int(float(capacity))
     #
     #   begin knapsack
     #
     #  questions : list[tuple (weight: int, value: int)]
     #  time_limit : int (C)
-    capacity = exam_information["time_limit"]
+
     for row in range(len(decision_matrix)):
         for col in range(len(decision_matrix[0])):
             if row == 0:
                 decision_matrix[row][col] = 0
-            elif questions[row][1] > col:
+            elif questions[row - 1][1] > col:
                 decision_matrix[row][col] = decision_matrix[row-1][col]
             else:
-                assert questions[row][1] < col
-                decision_matrix[row][col] = max(decision_matrix[row-1][col], decision_matrix[row-1][col-questions[row][0]])
+                assert questions[row -1][1] <= col
+                print(decision_matrix[row -1][col - questions [row-1][1]] + questions[row - 1][0])
+                decision_matrix[row][col] = max(decision_matrix[row-1][col], decision_matrix[row - 1][col - questions[row-1][1]] + questions[row -1][0])
+    #
+    # interpret result of matrix
+    #
+    ###for row in range(len(decision_matrix)):
+    ###    for col in range(len(decision_matrix[0])):
+    ###        print(decision_matrix[row][col], end=' ')
 
+
+    row = len(decision_matrix) - 1
+    col = len(decision_matrix[0]) - 1
+    questions_to_answer = []
+
+    while(col >= 0):
+        if decision_matrix[row][col] != decision_matrix[row][col-1]:
+            questions_to_answer.append(row)
+            row -= 1
+        col -= 1
+
+
+    return sorted(questions_to_answer), decision_matrix[len(decision_matrix)-1][len(decision_matrix[0])-1]
 
 
 
@@ -81,7 +105,7 @@ def parse_file(filename: str) -> tuple[list[tuple[int, int]], dict]:
     questions = []
     for line in lines[1:]:
         points, weight = line.split(" ")
-        questions.append((points, weight))
+        questions.append((int(points), int(weight)))
 
     return questions, exam_information
 

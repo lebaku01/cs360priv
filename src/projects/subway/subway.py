@@ -17,23 +17,32 @@ def read_file(filename: str) -> tuple[Graph, str, str]:
     lines = file.readlines()
     graph = Graph()
     for line in lines[1:-1]:
-        mapping = line.split(" ")
+
+        mapping = line.strip("\n").split(" ")
         graph.set_vertex(mapping[0])
         vertex = graph.get_vertex(mapping[0])
-        for adjacent in line.strip("\n").split(" "):
+        for adjacent in mapping[1:]:
             graph.set_vertex(adjacent)
             neighbor = graph.get_vertex(adjacent)
-
             graph.add_edge(vertex.get_key(), neighbor.get_key())
-            print(graph.get_vertex(vertex.get_key()).get_neighbors())
-    src, dst = lines[-1].strip("\n").split(" ")
+            print("==== graph view =====")
+            for each in graph:
+                print(each.get_neighbors())
+            print("======================")
 
+    src, dst = lines[-1].strip("\n").split(" ")
+    for each in graph:
+        print(each.get_neighbors())
     return graph, src, dst
 
 
 def find_routes(g: Graph, src: str, dst: str) -> str:
     """Find the path between two stations"""
+    """somewhere in between the previous fn and this one the source looses / never gains any edges????!?!?!?!?!"""
+    print(g)
     start = g.get_vertex(src)
+    print(repr(start.get_key()))
+    print(start.get_neighbors())
     g.bfs(start)
     path = []
     vertex = g.get_vertex(dst)
@@ -41,6 +50,8 @@ def find_routes(g: Graph, src: str, dst: str) -> str:
     while vertex is not None:
         path.insert(0, vertex.get_key())
         vertex = vertex.previous
+    print("right now I just need to solve a simple bug that is really stumping me with the graph generation, keys are being"
+          "removed at some point and this fn can't work as a result")
     return " ".join(path)
 
 def main():
@@ -48,6 +59,8 @@ def main():
     data_dir = "data/projects/subway/"
     for file in sorted(Path(data_dir).glob("*.in")):
         read_file(file.name)
+        print()
+
 
 
 if __name__ == "__main__":

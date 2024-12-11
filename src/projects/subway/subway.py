@@ -4,6 +4,8 @@
 
 from pythonds3.graphs import Graph
 
+from pathlib import Path
+
 
 def read_file(filename: str) -> tuple[Graph, str, str]:
     """
@@ -11,17 +13,41 @@ def read_file(filename: str) -> tuple[Graph, str, str]:
 
     Return the graph object and two vertices: start and destination
     """
-    pass
+    file = open(filename, "r")
+    lines = file.readlines()
+    graph = Graph()
+    for line in lines[1:-1]:
+        mapping = line.split(" ")
+        graph.set_vertex(mapping[0])
+        vertex = graph.get_vertex(mapping[0])
+        for adjacent in line.strip("\n").split(" "):
+            graph.set_vertex(adjacent)
+            neighbor = graph.get_vertex(adjacent)
+
+            graph.add_edge(vertex.get_key(), neighbor.get_key())
+            print(graph.get_vertex(vertex.get_key()).get_neighbors())
+    src, dst = lines[-1].strip("\n").split(" ")
+
+    return graph, src, dst
 
 
 def find_routes(g: Graph, src: str, dst: str) -> str:
     """Find the path between two stations"""
-    pass
-
+    start = g.get_vertex(src)
+    g.bfs(start)
+    path = []
+    vertex = g.get_vertex(dst)
+    start.set_previous(None)
+    while vertex is not None:
+        path.insert(0, vertex.get_key())
+        vertex = vertex.previous
+    return " ".join(path)
 
 def main():
     """This is the main function"""
-    pass
+    data_dir = "data/projects/subway/"
+    for file in sorted(Path(data_dir).glob("*.in")):
+        read_file(file.name)
 
 
 if __name__ == "__main__":

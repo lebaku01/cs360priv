@@ -52,6 +52,9 @@ def find_routes(g: Graph, src: str, dst: str) -> str:
     while vertex is not None:
         path.insert(0, vertex.get_key())
         vertex = vertex.previous
+    if src not in path:
+        return 'no route found'
+
     return " ".join(path)
 
 def main():

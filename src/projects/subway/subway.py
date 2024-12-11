@@ -19,20 +19,24 @@ def read_file(filename: str) -> tuple[Graph, str, str]:
     for line in lines[1:-1]:
 
         mapping = line.strip("\n").split(" ")
-        graph.set_vertex(mapping[0])
-        vertex = graph.get_vertex(mapping[0])
-        for adjacent in mapping[1:]:
-            graph.set_vertex(adjacent)
-            neighbor = graph.get_vertex(adjacent)
-            graph.add_edge(vertex.get_key(), neighbor.get_key())
-            print("==== graph view =====")
-            for each in graph:
-                print(each.get_neighbors())
-            print("======================")
 
+        if mapping[0] not in graph:
+            graph.set_vertex(mapping[0])
+
+        vertex = graph.get_vertex(mapping[0])
+
+        for adjacent in mapping[1:]:
+
+            if adjacent not in graph:
+                neighbor = graph.set_vertex(adjacent)
+
+            neighbor = graph.get_vertex(adjacent)
+            graph.add_edge(vertex.get_key(), adjacent)
     src, dst = lines[-1].strip("\n").split(" ")
     for each in graph:
-        print(each.get_neighbors())
+        print(each.get_key())
+        for every in list(each.get_neighbors()):
+            print("    "+every.get_key())
     return graph, src, dst
 
 

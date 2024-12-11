@@ -45,6 +45,8 @@ def find_routes(g: Graph, src: str, dst: str) -> str:
     """Find the path between two stations"""
     """somewhere in between the previous fn and this one the source looses / never gains any edges????!?!?!?!?!"""
     start = g.get_vertex(src)
+    if start is None:
+        return 'no route found'
     g.bfs(start)
     path = []
     vertex = g.get_vertex(dst)
